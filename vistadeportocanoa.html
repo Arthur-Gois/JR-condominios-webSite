@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Condomínio Vista de Porto Canoa. Gestão de excelência pela JR Gestão Condominial.">
+    <title>Vista de Porto Canoa | JR Gestão Condominial</title>
+    <style>
+        :root {
+            --azul-escuro: #1A365D; 
+            --verde-escuro: #1B5E3A;
+            --branco: #FFFFFF;
+            --fundo: #F8FAFC;
+            --texto-escuro: #1E293B;
+            --texto-claro: #64748B;
+            --destaque: #E2E8F0;
+            --transicao-padrao: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--fundo);
+            color: var(--texto-escuro);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* --- CABEÇALHO COMPARTILHADO --- */
+        .header-main {
+            position: fixed; top: 0; left: 0; width: 100%; padding: 20px 5%;
+            display: flex; justify-content: space-between; align-items: center;
+            z-index: 1000; background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            transition: var(--transicao-padrao);
+        }
+
+        .header-main.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 15px 5%; border-bottom: 1px solid transparent;
+        }
+
+        .logo img { width: 120px; height: auto; transition: var(--transicao-padrao); }
+
+        .btn-voltar {
+            color: var(--branco); text-decoration: none; font-weight: 600;
+            padding: 8px 20px; border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 30px; transition: var(--transicao-padrao);
+        }
+
+        .header-main.scrolled .btn-voltar { color: var(--azul-escuro); border-color: var(--azul-escuro); }
+        .btn-voltar:hover { background-color: var(--branco); color: var(--azul-escuro); }
+
+        /* --- HERO DO CONDOMÍNIO --- */
+        .condo-hero {
+            position: relative; min-height: 70vh; display: flex; align-items: center;
+            padding: 120px 5% 0;
+            background: linear-gradient(to right, rgba(26, 54, 93, 0.95) 0%, rgba(26, 54, 93, 0.4) 100%), 
+                        url('img/banner-vportocanoa.png') center/cover fixed;
+        }
+
+        .condo-hero-content { max-width: 800px; color: var(--branco); z-index: 2; }
+
+        .badge-construtora {
+            display: inline-block; background-color: var(--verde-escuro); color: var(--branco);
+            padding: 6px 16px; border-radius: 20px; font-size: 0.85rem; font-weight: bold;
+            text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem;
+        }
+
+        .condo-hero h1 { font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 800; line-height: 1.1; margin-bottom: 1rem; }
+        .condo-hero p { font-size: clamp(1rem, 1.5vw, 1.2rem); color: #E2E8F0; max-width: 600px; }
+
+        /* --- SEÇÃO DE DETALHES / AMENIDADES --- */
+        .condo-info { padding: 80px 5%; background-color: var(--branco); }
+        .section-header { text-align: center; margin-bottom: 3rem; }
+        .section-header h2 { font-size: clamp(2rem, 3vw, 2.5rem); color: var(--azul-escuro); }
+
+        .amenities-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px; max-width: 1200px; margin: 0 auto;
+        }
+
+        .amenity-card {
+            background: var(--fundo); padding: 30px; border-radius: 16px;
+            text-align: center; transition: var(--transicao-padrao);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .amenity-card:hover {
+            transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            border-color: var(--verde-escuro);
+        }
+
+        .amenity-icon { font-size: 2.5rem; margin-bottom: 15px; color: var(--verde-escuro); }
+        .amenity-card h3 { color: var(--azul-escuro); margin-bottom: 10px; font-size: 1.2rem; }
+        .amenity-card p { color: var(--texto-claro); font-size: 0.95rem; }
+
+        /* --- EFEITOS DE REVELAÇÃO (JS) --- */
+        .reveal {
+            opacity: 0; transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        .reveal.active { opacity: 1; transform: translateY(0); }
+
+        .footer-main {
+            background: linear-gradient(135deg, var(--azul-escuro) 0%, rgba(27, 94, 58, 0.95) 100%);
+            color: var(--branco); padding: 60px 5% 0; margin-top: 80px;
+        }
+
+        .footer-content {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px; max-width: 1200px; margin: 0 auto; padding-bottom: 40px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .footer-section h3, .footer-section h4 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1rem; color: #E2E8F0; }
+        .footer-section p { font-size: 0.95rem; line-height: 1.8; color: #CBD5E1; margin-bottom: 0.75rem; }
+        .footer-section ul { list-style: none; }
+        .footer-section ul li { margin-bottom: 0.75rem; }
+        .footer-section a { color: #E2E8F0; text-decoration: none; transition: var(--transicao-padrao); font-weight: 500; }
+        .footer-section a:hover { color: #4ADE80; text-decoration: underline; }
+
+        .social-links { display: flex; gap: 20px; flex-wrap: wrap; }
+        .social-links a {
+            display: inline-block; padding: 8px 16px; border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px; transition: var(--transicao-padrao);
+        }
+        .social-links a:hover { background-color: rgba(74, 222, 128, 0.2); border-color: #4ADE80; color: #4ADE80; text-decoration: none; }
+        .footer-bottom { text-align: center; padding: 30px 0; font-size: 0.9rem; color: #94A3B8; }
+
+        /* --- RESPONSIVIDADE --- */
+        @media (max-width: 768px) {
+            .header-main { background: rgba(255, 255, 255, 0.95); }
+            .header-main .btn-voltar { color: var(--azul-escuro); border-color: var(--azul-escuro); }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-main" id="header">
+        <a href="index.html" class="logo" aria-label="Página Inicial JR Gestão">
+            <img src="img/logo.png" alt="Logotipo JR Gestão Condominial" onerror="this.src='https://via.placeholder.com/120x40?text=Logo'">
+        </a>
+        <a href="index.html" class="btn-voltar">← Voltar</a>
+    </header>
+
+    <main>
+        <section class="condo-hero" id="hero">
+            <div class="condo-hero-content reveal">
+                <span class="badge-construtora">Empreendimento Morar</span>
+                <h1>Vista de Porto Canoa</h1>
+                <p>Conforto, segurança e área de lazer completa. A gestão inteligente da JR garante que o seu patrimônio seja cuidado com o mais alto padrão de qualidade.</p>
+            </div>
+        </section>
+
+        <section class="condo-info" id="condo-info">
+            <div class="section-header reveal">
+                <h2>Informações para Contato</h2>
+                <p style="color: var(--texto-claro); margin-top: 10px;">Tudo o que você precisa para viver bem.</p>
+            </div>
+
+            <div class="amenities-grid">
+                <div class="amenity-card reveal">
+                    <div class="amenity-icon">📧</div>
+                    <h3>E-mail Sindico</h3>
+                    <p>E-mail: Vistadeportocanoa@gmail.com</p>
+                </div>
+                <div class="amenity-card reveal">
+                    <div class="amenity-icon">📧</div>
+                    <h3>E-mail ADM</h3>
+                    <p>E-mail: Admvistadeportocanoa@gmail.com</p>
+                </div>
+                <div class="amenity-card reveal">
+                    <div class="amenity-icon">☎️</div>
+                    <h3>Número ADM</h3>
+                    <p>Telefone: +55 (27) 99281-9404</p>
+                </div>
+                <div class="amenity-card reveal">
+                    <div class="amenity-icon">☎️</div>
+                    <h3>Número Portaria</h3>
+                    <p>Telefone: +55 (27) 98883-0419</p> </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer-main" id="footer-main">
+        <div class="footer-content">
+            <div class="footer-section">
+                <img src="img/logo.png" alt="Logotipo JR Gestão Condominial" style="width: 100px; margin-bottom: 20px;">
+                <p>Administração inteligente, transparente e dedicada à excelência operacional dos seus empreendimentos.</p>
+            </div>
+            <div class="footer-section">
+                <h4>Navegação</h4>
+                <ul>
+                    <li><a href="#hero">Início</a></li>
+                    <li><a href="#condo-info">Contato</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h4>Contato</h4>
+                <p>Email: <a href="mailto:jrgestaocondominal@gmail.com">jrgestaocondominal@gmail.com</a></p>
+                <p>Telefone: <a href="tel:+5527992059697">+55 (27) 99205-9697</a></p>
+            </div>
+            <div class="footer-section">
+                <h4>Redes Sociais</h4>
+                <div class="social-links">
+                    <a href="https://www.instagram.com/jrgestaocondominal?igsh=ZjAzMXM2N21zZjVl&utm_source=qr" aria-label="Instagram" target="_blank">Instagram</a>
+                    <a href="https://wa.me/5527992059697" aria-label="WhatsApp" target="_blank">WhatsApp</a>
+                </div>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 JR Gestão Condominial. Todos os direitos reservados.</p>
+        </div>
+    </footer>
+
+    <script>
+        const header = document.getElementById('header');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) header.classList.add('scrolled');
+            else header.classList.remove('scrolled');
+        });
+
+        const revealElements = document.querySelectorAll('.reveal');
+        const revealObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                }
+            });
+        }, { root: null, threshold: 0.15, rootMargin: "0px 0px -50px 0px" });
+
+        revealElements.forEach((el, index) => {
+            if(el.closest('.amenities-grid')) {
+                let delay = (index % 4) * 0.15;
+                el.style.transitionDelay = `${delay}s`;
+            }
+            revealObserver.observe(el);
+        });
+    </script>
+</body>
+</html>
